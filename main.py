@@ -66,44 +66,66 @@ def empezar():
         "Esmeralda Rodríguez-Salinas", "Francisco Silva", "Evenyer Solorzáno", "Julissa Somarriba",
         "Miguel Suarez", "Jocksand Valladares"
     ]
-    contador = 0
-    angulo = -15
     cx = 300
     cy = 300
     R = 250
+
+
+    activos = list(nombres[:len(colores)])
+
+    eliminar_var = tk.BooleanVar(value=True)
+
+
+
     arco_ids = []
     texto_ids = []
     inicios_base = []
     medios_base = []
-    while contador < 24:
-        angulo = angulo + 15
-        arco_id = lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=15, fill=colores[contador])
-        medio = angulo + 15 / 2
-        rad = math.radians(medio)
-        x = cx + (R - 10) * math.cos(rad)
-        y = cy - (R - 10) * math.sin(rad)
+    estado = {"offset": 0.0, "velocidad": 0.0, "girando": False, "n": 0}
 
-        texto_id = lienzo.create_text(x, y, text=str(nombres[contador]),
-                           fill="white", font=("Arial", 9, "bold"),
-                           angle=medio, anchor="e")
+    def dibujar_ruleta():
+        lienzo.delete("rueda")
+        arco_ids.clear()
+        texto_ids.clear()
+        inicios_base.clear()
+        medios_base.clear()
 
-        arco_ids.append(arco_id)
-        texto_ids.append(texto_id)
-        inicios_base.append(angulo)
-        medios_base.append(medio)
-        contador = contador + 1
+        n = len(activos)
+        estado["n"] = n
+        estado["offset"] = 0.0
+        if n == 0:
+            return
 
-    # flecha fija que señala al ganador
+        paso = 360 / n
+        angulo = -paso
+        for i in range(n):
+            angulo = angulo + paso
+            arco_id = lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=paso,
+                                        fill=colores[i % len(colores)], tags="rueda")
+            medio = angulo + paso / 2
+            rad = math.radians(medio)
+            x = cx + (R - 10) * math.cos(rad)
+            y = cy - (R - 10) * math.sin(rad)
+
+            texto_id = lienzo.create_text(x, y, text=str(activos[i]),
+                               fill="white", font=("Arial", 9, "bold"),
+                               angle=medio, anchor="e", tags="rueda")
+
+            arco_ids.append(arco_id)
+            texto_ids.append(texto_id)
+            inicios_base.append(angulo)
+            medios_base.append(medio)
+
+    dibujar_ruleta()
+
+    # flecha fija que señala al ganador (no rota con la ruleta)
     lienzo.create_polygon(285, 30, 315, 30, 300, 55, fill="black", outline="white")
 
     lienzo.grid(column=10, row=0)
 
-
-    estado = {"offset": 0.0, "velocidad": 0.0, "girando": False}
-
     def dibujar_rotacion():
         offset = estado["offset"]
-        for i in range(24):
+        for i in range(estado["n"]):
             nuevo_inicio = (inicios_base[i] + offset) % 360
             lienzo.itemconfig(arco_ids[i], start=nuevo_inicio)
 
@@ -122,26 +144,42 @@ def empezar():
             ventana.after(20, animar)
         else:
             estado["girando"] = False
-            btnGirar.state(["!disabled"])
             anunciar_ganador()
 
     def anunciar_ganador():
+        n = estado["n"]
+        paso = 360 / n
         relativo = (90 - estado["offset"]) % 360
-        indice = int(relativo // 15) % 24
-        messagebox.showinfo("Ganador", f"¡El ganador es {nombres[indice]}!")
+        indice = int(relativo // paso) % n
+        ganador = activos[indice]
+        messagebox.showinfo("Ganador", f"¡El ganador es {ganador}!")
+
+        if eliminar_var.get():
+            del activos[indice]
+            dibujar_ruleta()
+
+        if len(activos) == 0:
+            btnGirar.state(["disabled"])
+        else:
+            btnGirar.state(["!disabled"])
 
     def girar():
-        if estado["girando"]:
+        if estado["girando"] or len(activos) == 0:
             return
         estado["girando"] = True
         btnGirar.state(["disabled"])
         estado["velocidad"] = random.uniform(28, 36)
         animar()
 
+    chkEliminar = ttk.Checkbutton(ventana, text="Eliminar participante al ganar", variable=eliminar_var)
+    chkEliminar.grid(column=10, row=1, pady=5)
+
     btnGirar = ttk.Button(ventana, text="Girar", style="Azul.TButton", command=girar)
-    btnGirar.grid(column=10, row=1, pady=11)
+    btnGirar.grid(column=10, row=2, pady=11)
+
     btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
-    btnSalir.grid(column=10, row=2, pady=11)
+    btnSalir.grid(column=10, row=3, pady=11)
+
 
 #Creditos
 def creditos():
@@ -154,7 +192,7 @@ def creditos():
     2. Jocksand
     3. Francisco
     4. Mauricio
-    5. Cristhian y Franko por los calzones
+    5. Braxus Calzones
     
     FIN""", font=("Arial", 14, "bold"),
                     fg="white", bg="steelblue")
