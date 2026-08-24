@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
-
+import math
 
 #Ventana
 ventana = tk.Tk()
 ventana.title("Ruleta")
 ventana.configure(background="lightblue")
-ventana.geometry("600x600")
+ventana.geometry("800x900")
 #Estilo creado
 estilo = ttk.Style()
 estilo.theme_use("clam")
@@ -66,15 +66,26 @@ def empezar():
     ]
     contador = 0
     angulo = -15
+    cx = 300
+    cy = 300
+    R = 250
     while contador < 24:
         angulo = angulo + 15
         lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=15, fill=colores[contador])
+        medio = angulo + 15 / 2
+        rad = math.radians(medio)
+        x = cx + (R - 10) * math.cos(rad)
+        y = cy - (R - 10) * math.sin(rad)
+
+        lienzo.create_text(x, y, text=str(nombres[contador]),
+                           fill="white", font=("Arial", 9, "bold"),
+                           angle=medio, anchor="e")
         contador = contador + 1
-
     lienzo.grid(column=10, row=0)
-    boton = ttk.Button(ventana, text="Salir", command=ventana.destroy)
-
-    lienzo.create_window(1200, 150, window=boton)
+    btnGirar = ttk.Button(ventana, text="Girar", style="Azul.TButton")
+    btnGirar.grid(column=10, row=1, pady=11)
+    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
+    btnSalir.grid(column=10, row=2, pady=11)
 
 #Creditos
 def creditos():
