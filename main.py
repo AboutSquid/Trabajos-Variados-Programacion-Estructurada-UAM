@@ -64,10 +64,6 @@ def empezar():
     alumnos(botones, lienzo, colores)
 
     botones.grid(column=10, row=2)
-    btnGirar = ttk.Button(botones, text="Girar", style="Azul.TButton")
-    btnGirar.grid(column=3, row=1, pady=11)
-    btnSalir = ttk.Button(botones, text="Salir", style="Azul.TButton", command=menu)
-    btnSalir.grid(column=3, row=2, pady=11)
 
 
 #Sistema de Nombres
@@ -89,16 +85,25 @@ def alumnos(botones, lienzo, colores):
     for nombre in nombres:
         ListaDeRandoms.insert(tk.END, f"{nombre}\n")
 
+    recargar_lista(ListaDeRandoms, colores, lienzo, botones)
     contenido =ListaDeRandoms.get("1.0", tk.END)
     lista_nombres = contenido.strip().split('\n')
-    actualizar(lista_nombres, colores, lienzo)
+    actualizar(lista_nombres, colores, lienzo, botones)
 
    # btnanadir = ttk.Button(ventana, text )
    # Menusito = tk.OptionMenu(ventana, nombres, *nombres)
     #Menusito.pack(pady=10)
-
+#recargar lista
+def recargar_lista(ListaDeRandoms,colores,lienzo,botones):
+    texto_nuevo = ListaDeRandoms.get("1.0", tk.END).strip().split('\n')
+    # Filtramos para no pasar líneas en blanco
+    nombres_limpios = [n for n in texto_nuevo if n.strip() != ""]
+    if len(nombres_limpios) > 0:
+        lienzo.delete("all")  # Limpia la ruleta anterior antes de redibujar
+        actualizar(nombres_limpios, colores, lienzo, botones)
 #actualizar ruleta
-def actualizar(lista_nombres, colores, lienzo):
+def actualizar(lista_nombres, colores, lienzo, botones):
+    lienzo.delete("all")
     contador = 0
     num = 360 / len(lista_nombres)  # para calcular el angulo que debe tener cada trozo
     angulo = num*-1
@@ -137,7 +142,7 @@ def actualizar(lista_nombres, colores, lienzo):
 
     def dibujar_rotacion():
         offset = estado["offset"]
-        for i in range(24):
+        for i in range(len(lista_nombres)):
             nuevo_inicio = (inicios_base[i] + offset) % 360
             lienzo.itemconfig(arco_ids[i], start=nuevo_inicio)
 
@@ -161,7 +166,7 @@ def actualizar(lista_nombres, colores, lienzo):
 
     def anunciar_ganador():
         relativo = (90 - estado["offset"]) % 360
-        indice = int(relativo // 15) % 24
+        indice = int(relativo // num) % len(lista_nombres)
         messagebox.showinfo("Ganador", f"¡El ganador es {lista_nombres[indice]}!")
 
     def girar():
@@ -172,10 +177,11 @@ def actualizar(lista_nombres, colores, lienzo):
         estado["velocidad"] = random.uniform(28, 36)
         animar()
 
-    btnGirar = ttk.Button(ventana, text="Girar", style="Azul.TButton", command=girar)
-    btnGirar.grid(column=10, row=1, pady=11)
-    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
-    btnSalir.grid(column=10, row=2, pady=11)
+    btnGirar = ttk.Button(botones, text="Girar", style="Azul.TButton", command=girar)
+    btnGirar.grid(column=3, row=1, pady=11)
+    btnSalir = ttk.Button(botones, text="Salir", style="Azul.TButton", command=menu)
+    btnSalir.grid(column=3, row=2, pady=11)
+
 
 #Creditos
 def creditos():
