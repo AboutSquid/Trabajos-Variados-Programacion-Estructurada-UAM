@@ -4,14 +4,38 @@ import time
 import random
 
 
-NOMBRES_BASE = [
-    "Gretchen Aburto", "Francisco Álvarez", "Guillermo Ayerdis", "Carlos Benavides",
-    "José René Bonilla", "Alex Carballo", "Carlos Castillo", "Raúl Castillo", "Camilo Cruz",
-    "Leah Dávila", "William Hawkins", "Mauricio Lacayo", "Sofía Martínez", "Dorian Martínez",
-    "Reynaldo Mondragón", "Alejandro Mondragón", "Gylbert Ordoñez", "Alyssa Rodríguez", "Shane Rodríguez",
-    "Esmeralda Rodríguez-Salinas", "Francisco Silva", "Evenyer Solorzáno", "Julissa Somarriba",
-    "Miguel Suarez", "Jocksand Valladares"
-]
+# Los participantes están organizados en 8 grupos (según las 8 líneas originales).
+GRUPOS = {
+    "Grupo 1": ["Gretchen Aburto", "Leah Dávila", "Sofía Martínez", "Guillermo Ayerdis"],
+    "Grupo 2": ["Alyssa Rodríguez", "Alejandro Mondragón", "Esmeralda Rodríguez-Salinas"],
+    "Grupo 3": ["Camilo Cruz", "Reynaldo Mondragón", "Miguel Suárez"],
+    "Grupo 4": ["Gylbert Ordoñez", "Shane Rodríguez", "Julissa Somarriba"],
+    "Grupo 5": ["Francisco Álvarez", "Raúl Castillo", "Mauricio Lacayo", "Jocksand Valladares"],
+    "Grupo 6": ["José René Bonilla", "William Hawkins", "Dorian Martínez", "Francisco Silva"],
+    "Grupo 7": ["Carlos Benavides", "Alex Carballo", "Evenyer Solórzano"],
+    "Grupo 8": ["Carlos Castillo"],
+}
+
+
+def construir_nombre_a_grupo():
+    mapa = {}
+    for grupo, nombres in GRUPOS.items():
+        for nombre in nombres:
+            mapa[nombre] = grupo
+    return mapa
+
+
+NOMBRE_A_GRUPO = construir_nombre_a_grupo()
+
+
+def todos_los_nombres():
+    resultado = []
+    for nombres in GRUPOS.values():
+        resultado.extend(nombres)
+    return resultado
+
+
+NOMBRES_BASE = todos_los_nombres()
 
 EQUIPO = ["Raul", "Jocksand", "Francisco", "Mauricio", "Braxus Calzones"]
 
@@ -46,7 +70,8 @@ def menu():
         opcion = input("Elige una opción: ")
 
         if opcion == "1":
-            sorteo()
+            # La ruleta SIEMPRE incluye a todos los grupos y participantes.
+            sorteo(list(NOMBRES_BASE))
         elif opcion == "2":
             creditos()
         elif opcion == "3":
@@ -71,7 +96,21 @@ def mostrar_participantes(activos):
         print("  (no quedan participantes)")
         return
     for i, nombre in enumerate(activos, start=1):
-        print(f"  {i:>2}. {nombre}")
+        grupo = NOMBRE_A_GRUPO.get(nombre, "sin grupo")
+        print(f"  {i:>2}. {nombre}  [{grupo}]")
+
+
+def mostrar_grupos_restantes(activos):
+    grupos_presentes = sorted(
+        {NOMBRE_A_GRUPO.get(nombre, "sin grupo") for nombre in activos},
+        key=lambda g: (g not in GRUPOS, g),
+    )
+    print(f"\nGrupos restantes en la ruleta ({len(grupos_presentes)}):")
+    if not grupos_presentes:
+        print("  (no quedan grupos)")
+        return
+    for grupo in grupos_presentes:
+        print(f"  •  {grupo}")
 
 
 def girar(activos):
@@ -92,6 +131,23 @@ def girar(activos):
     print()
     print(f"\n¡El ganador es: {ganador}! 🎉\n")
     return ganador
+
+
+def eliminar_grupo_del_ganador(activos, ganador):
+    """Elimina de la lista de activos a TODOS los integrantes del grupo
+    al que pertenece el ganador (incluyendo al propio ganador)."""
+    grupo_ganador = NOMBRE_A_GRUPO.get(ganador)
+    if grupo_ganador is None:
+        # Si por alguna razón no pertenece a ningún grupo conocido,
+        # solo se elimina a esa persona.
+        if ganador in activos:
+            activos.remove(ganador)
+        return []
+
+    integrantes_grupo = [n for n in GRUPOS[grupo_ganador] if n in activos]
+    for nombre in integrantes_grupo:
+        activos.remove(nombre)
+    return integrantes_grupo
 
 
 def editar_lista(activos):
@@ -129,22 +185,23 @@ def eliminar_manual(activos):
     pausa()
 
 
-def sorteo():
-    activos = list(NOMBRES_BASE)
+def sorteo(activos_iniciales):
+    activos = list(activos_iniciales)
     eliminar_al_ganar = True
 
     while True:
         limpiar()
         encabezado("RULETA DE SORTEO — Girando")
         mostrar_participantes(activos)
+        mostrar_grupos_restantes(activos)
 
-        estado_eliminar = "SI" if eliminar_al_ganar else "NO"
-        print(f"\nEliminar participante al ganar: {estado_eliminar}")
+        estado_eliminar = "SI (elimina TODO el grupo del ganador)" if eliminar_al_ganar else "NO"
+        print(f"\nEliminar grupo completo al ganar: {estado_eliminar}")
         print("\n  1) Girar")
         print("  2) Editar lista de participantes")
         print("  3) Eliminar un participante manualmente")
         print("  4) Restablecer lista original")
-        print("  5) Activar/desactivar eliminar al ganar")
+        print("  5) Activar/desactivar eliminar grupo al ganar")
         print("  6) Volver al menú\n")
 
         opcion = input("Elige una opción: ").strip()
@@ -157,14 +214,21 @@ def sorteo():
             encabezado("RULETA DE SORTEO — Girando")
             ganador = girar(activos)
             if eliminar_al_ganar:
-                activos.remove(ganador)
+                grupo_ganador = NOMBRE_A_GRUPO.get(ganador, "sin grupo")
+                eliminados = eliminar_grupo_del_ganador(activos, ganador)
+                if len(eliminados) > 1:
+                    print(f"Se eliminó todo el {grupo_ganador} de la ruleta:")
+                    for nombre in eliminados:
+                        print(f"  •  {nombre}")
+                else:
+                    print(f"Se eliminó a {ganador} de la ruleta.")
             pausa()
         elif opcion == "2":
             editar_lista(activos)
         elif opcion == "3":
             eliminar_manual(activos)
         elif opcion == "4":
-            activos = list(NOMBRES_BASE)
+            activos = list(activos_iniciales)
             input("\nLista restablecida. Presiona ENTER...")
         elif opcion == "5":
             eliminar_al_ganar = not eliminar_al_ganar
