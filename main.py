@@ -54,11 +54,12 @@ def creditos():
     2. Jocksand
     3. Francisco
     4. Mauricio
-    5. Cris y _____ por los calzones
+    5. Cristhian y Franko por los calzones
     
     FIN""", font=("Arial", 14, "bold"),
                     fg="white", bg="steelblue")
     PersonasTxT.pack(pady=10)
-
+    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
+    btnSalir.pack(pady=10)
 menu()
 ventana.mainloop()
