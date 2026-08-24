@@ -1,7 +1,9 @@
 import tkinter as tk
 from random import random
 from tkinter import ttk
+from tkinter import messagebox
 import math
+import random
 
 #Ventana
 ventana = tk.Tk()
@@ -103,18 +105,78 @@ def actualizar(lista_nombres, colores, lienzo):
     cx = 300
     cy = 300
     R = 250
+    arco_ids = []
+    texto_ids = []
+    inicios_base = []
+    medios_base = []
     while contador < len(lista_nombres):
         angulo = angulo + num
-        lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=num, fill=colores[contador % len(colores)])
+        arco_id = lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=num, fill=colores[contador % len(colores)])
         medio = angulo + num / 2
         rad = math.radians(medio)
         x = cx + (R - 10) * math.cos(rad)
         y = cy - (R - 10) * math.sin(rad)
 
-        lienzo.create_text(x, y, text=str(lista_nombres[contador]),
-                           fill="white", font=("Arial", 9, "bold"),
-                           angle=medio, anchor="e")
+        texto_id = lienzo.create_text(x, y, text=str(lista_nombres[contador]),
+                                      fill="white", font=("Arial", 9, "bold"),
+                                      angle=medio, anchor="e")
+
+        arco_ids.append(arco_id)
+        texto_ids.append(texto_id)
+        inicios_base.append(angulo)
+        medios_base.append(medio)
         contador = contador + 1
+
+    # flecha fija que señala al ganador
+    lienzo.create_polygon(285, 30, 315, 30, 300, 55, fill="black", outline="white")
+
+    lienzo.grid(column=10, row=0)
+
+
+    estado = {"offset": 0.0, "velocidad": 0.0, "girando": False}
+
+    def dibujar_rotacion():
+        offset = estado["offset"]
+        for i in range(24):
+            nuevo_inicio = (inicios_base[i] + offset) % 360
+            lienzo.itemconfig(arco_ids[i], start=nuevo_inicio)
+
+            nuevo_medio = medios_base[i] + offset
+            rad = math.radians(nuevo_medio)
+            x = cx + (R - 10) * math.cos(rad)
+            y = cy - (R - 10) * math.sin(rad)
+            lienzo.coords(texto_ids[i], x, y)
+            lienzo.itemconfig(texto_ids[i], angle=nuevo_medio % 360)
+
+    def animar():
+        estado["offset"] = (estado["offset"] + estado["velocidad"]) % 360
+        dibujar_rotacion()
+        estado["velocidad"] *= 0.97
+        if estado["velocidad"] > 0.3:
+            ventana.after(20, animar)
+        else:
+            estado["girando"] = False
+            btnGirar.state(["!disabled"])
+            anunciar_ganador()
+
+    def anunciar_ganador():
+        relativo = (90 - estado["offset"]) % 360
+        indice = int(relativo // 15) % 24
+        messagebox.showinfo("Ganador", f"¡El ganador es {lista_nombres[indice]}!")
+
+    def girar():
+        if estado["girando"]:
+            return
+        estado["girando"] = True
+        btnGirar.state(["disabled"])
+        estado["velocidad"] = random.uniform(28, 36)
+        animar()
+
+    btnGirar = ttk.Button(ventana, text="Girar", style="Azul.TButton", command=girar)
+    btnGirar.grid(column=10, row=1, pady=11)
+    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
+    btnSalir.grid(column=10, row=2, pady=11)
+
 #Creditos
 def creditos():
     limpiar()
