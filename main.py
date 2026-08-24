@@ -4,22 +4,54 @@ from tkinter import messagebox
 import math
 import random
 
+COLOR_BG = "#eef3fb"
+COLOR_HEADER = "#1c4e80"
+COLOR_CARD = "#ffffff"
+COLOR_PRIMARY = "#f2994a"
+COLOR_PRIMARY_ACTIVE = "#d97f2e"
+COLOR_SECONDARY = "#2c5f8a"
+COLOR_SECONDARY_ACTIVE = "#1c4a68"
+COLOR_TEXT = "#22303f"
+COLOR_MUTED = "#5a6b7b"
+
+FUENTE_TITULO = ("Arial", 20, "bold")
+FUENTE_SUBTITULO = ("Arial", 11)
+FUENTE_SECCION = ("Arial", 11, "bold")
+FUENTE_TEXTO = ("Arial", 12)
+
 #Ventana
 ventana = tk.Tk()
 ventana.title("Ruleta")
-ventana.configure(background="lightblue")
-ventana.geometry("800x900")
+ventana.configure(background=COLOR_BG)
+ventana.geometry("560x560")
+
 #Estilo creado
 estilo = ttk.Style()
 estilo.theme_use("clam")
-estilo.configure("Azul.TButton",
-                 background="steelblue",
+
+estilo.configure("Primary.TButton",
+                 background=COLOR_PRIMARY,
                  foreground="white",
                  font=("Arial", 14, "bold"),
                  borderwidth=0,
+                 padding=12)
+estilo.map("Primary.TButton",
+           background=[("active", COLOR_PRIMARY_ACTIVE)])
+
+estilo.configure("Secondary.TButton",
+                 background=COLOR_SECONDARY,
+                 foreground="white",
+                 font=("Arial", 12, "bold"),
+                 borderwidth=0,
                  padding=10)
-estilo.map("Azul.TButton",
-           background=[("active", "#2c5f8a")])
+estilo.map("Secondary.TButton",
+           background=[("active", COLOR_SECONDARY_ACTIVE)])
+
+estilo.configure("Info.TCheckbutton",
+                 background=COLOR_CARD,
+                 foreground=COLOR_TEXT,
+                 font=("Arial", 10, "bold"))
+estilo.map("Info.TCheckbutton", background=[("active", COLOR_CARD)])
 
 
 # Funciones a llamar
@@ -31,24 +63,49 @@ def limpiar():
 #Menu
 def menu():
     limpiar()
-    etiqueta = tk.Label(ventana, text="Bienvenido a la ruleta",
-                    font=("Arial", 14, "bold"),
-                    fg="white", bg="steelblue")
-    etiqueta.pack(pady=10)
+    ventana.title("Ruleta")
+    ventana.geometry("560x560")
+    ventana.configure(background=COLOR_BG)
 
-    btnEmpezar = ttk.Button(ventana, text="Empezar", style="Azul.TButton", command = empezar)
-    btnEmpezar.pack(pady=10)
+    tarjeta = tk.Frame(ventana, bg=COLOR_CARD, highlightbackground=COLOR_SECONDARY, highlightthickness=2)
+    tarjeta.place(relx=0.5, rely=0.5, anchor="center", width=420, height=400)
 
-    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=Salir)
-    btnSalir.pack(pady=10)
+    tk.Label(tarjeta, text="O", font=("Arial", 48), bg=COLOR_CARD).pack(pady=(30, 5))
+    tk.Label(tarjeta, text="Ruleta de Sorteo", font=FUENTE_TITULO,
+             fg=COLOR_HEADER, bg=COLOR_CARD).pack(pady=(0, 5))
+    tk.Label(tarjeta, text="Gira, elimina participantes y encuentra al ganador",
+             font=FUENTE_SUBTITULO, fg=COLOR_MUTED, bg=COLOR_CARD).pack(pady=(0, 25))
 
-    btnCreditos = ttk.Button(ventana, text="Creditos", style="Azul.TButton", command=creditos)
-    btnCreditos.pack(pady=10)
+    btnEmpezar = ttk.Button(tarjeta, text="Empezar", style="Primary.TButton", command=empezar, width=22)
+    btnEmpezar.pack(pady=6)
+
+    btnCreditos = ttk.Button(tarjeta, text="Créditos", style="Secondary.TButton", command=creditos, width=22)
+    btnCreditos.pack(pady=6)
+
+    btnSalir = ttk.Button(tarjeta, text="Salir", style="Secondary.TButton", command=Salir, width=22)
+    btnSalir.pack(pady=6)
 #Empezar
 def empezar():
     limpiar()
-    lienzo = tk.Canvas(ventana, width=600, height=600, bg="lightblue")
-    ventana.title("RULETA")
+    ventana.title("Ruleta — Girando")
+    ventana.geometry("1020x700")
+    ventana.configure(background=COLOR_BG)
+
+    encabezado = tk.Frame(ventana, bg=COLOR_HEADER)
+    encabezado.pack(side="top", fill="x")
+    tk.Label(encabezado, text="Ruleta", font=("Arial", 18, "bold"),
+             fg="white", bg=COLOR_HEADER).pack(pady=14)
+
+    contenido = tk.Frame(ventana, bg=COLOR_BG)
+    contenido.pack(fill="both", expand=True, padx=25, pady=20)
+    contenido.columnconfigure(0, weight=1)
+    contenido.columnconfigure(1, weight=0)
+
+    panel_ruleta = tk.Frame(contenido, bg=COLOR_BG)
+    panel_ruleta.grid(row=0, column=0, sticky="n")
+
+    lienzo = tk.Canvas(panel_ruleta, width=600, height=600, bg=COLOR_BG, highlightthickness=0)
+    lienzo.pack()
 
     # colores para la ruleta
     colores = [
@@ -57,12 +114,10 @@ def empezar():
         "plum", "orchid", "olive", "teal", "navy", "crimson", "tomato", "skyblue", "black"
     ]
 
-    lienzo.grid(column=10, row=0)
+    panel_controles = tk.Frame(contenido, bg=COLOR_BG)
+    panel_controles.grid(row=0, column=1, sticky="n", padx=(25, 0))
 
-    botones = tk.Frame(ventana, bg="lightblue", bd=10, relief="flat")
-    alumnos(botones, lienzo, colores)
-
-    botones.grid(column=10, row=2)
+    alumnos(panel_controles, lienzo, colores)
 
 
 #Sistema de Nombres y de la ruleta
@@ -81,8 +136,15 @@ def alumnos(botones, lienzo, colores):
     cy = 300
     R = 250
 
-    ListaDeRandoms = tk.Text(botones, width=20, height=10, bg="white")
-    ListaDeRandoms.grid(column=10, row=1, rowspan=11, padx=40, pady=11)
+    marco_lista = tk.LabelFrame(botones, text="Participantes", font=FUENTE_SECCION,
+                                 fg=COLOR_HEADER, bg=COLOR_CARD, bd=2, relief="groove",
+                                 padx=12, pady=12)
+    marco_lista.pack(fill="x", pady=(0, 16))
+
+    ListaDeRandoms = tk.Text(marco_lista, width=26, height=12, bg="white", fg=COLOR_TEXT,
+                              relief="flat", highlightthickness=1, highlightbackground=COLOR_SECONDARY,
+                              font=("Arial", 10))
+    ListaDeRandoms.pack(pady=(0, 10))
     for nombre in nombres:
         ListaDeRandoms.insert(tk.END, f"{nombre}\n")
 
@@ -109,6 +171,7 @@ def alumnos(botones, lienzo, colores):
         estado["n"] = n
         estado["offset"] = 0.0
         if n == 0:
+            lienzo.tag_raise("frente")
             return
 
         paso = 360 / n
@@ -116,7 +179,7 @@ def alumnos(botones, lienzo, colores):
         for i in range(n):
             angulo = angulo + paso
             arco_id = lienzo.create_arc(50, 50, 550, 550, start=angulo, extent=paso,
-                                        fill=colores[i % len(colores)], tags="rueda")
+                                        fill=colores[i % len(colores)], outline=COLOR_CARD, width=1, tags="rueda")
             medio = angulo + paso / 2
             rad = math.radians(medio)
             x = cx + (R - 10) * math.cos(rad)
@@ -131,6 +194,9 @@ def alumnos(botones, lienzo, colores):
             inicios_base.append(angulo)
             medios_base.append(medio)
 
+        # el aro, el eje y la flecha siempre deben quedar por encima de la rueda
+        lienzo.tag_raise("frente")
+
     def recargar_lista():
         # toma lo que el usuario haya escrito/editado en el cuadro de texto
         # y lo vuelve la lista de participantes activos de la ruleta
@@ -142,10 +208,12 @@ def alumnos(botones, lienzo, colores):
             dibujar_ruleta()
             btnGirar.state(["!disabled"])
 
-    dibujar_ruleta()
+    # aro decorativo, eje central y flecha fija que señala al ganador
+    lienzo.create_oval(45, 45, 555, 555, outline=COLOR_HEADER, width=4, tags="frente")
+    lienzo.create_oval(280, 280, 320, 320, fill="white", outline=COLOR_HEADER, width=3, tags="frente")
+    lienzo.create_polygon(285, 22, 315, 22, 300, 55, fill=COLOR_PRIMARY, outline="white", width=2, tags="frente")
 
-    # flecha fija que señala al ganador (no rota con la ruleta)
-    lienzo.create_polygon(285, 30, 315, 30, 300, 55, fill="black", outline="white")
+    dibujar_ruleta()
 
     def dibujar_rotacion():
         offset = estado["offset"]
@@ -195,36 +263,47 @@ def alumnos(botones, lienzo, colores):
         estado["velocidad"] = random.uniform(28, 36)
         animar()
 
-    btnActualizar = ttk.Button(botones, text="Actualizar lista", style="Azul.TButton", command=recargar_lista)
-    btnActualizar.grid(column=3, row=0, pady=11)
+    btnActualizar = ttk.Button(marco_lista, text="Actualizar lista", style="Secondary.TButton",
+                                command=recargar_lista, width=22)
+    btnActualizar.pack()
 
-    chkEliminar = ttk.Checkbutton(botones, text="Eliminar participante al ganar", variable=eliminar_var)
-    chkEliminar.grid(column=3, row=1, pady=5)
+    marco_controles = tk.LabelFrame(botones, text="Controles", font=FUENTE_SECCION,
+                                     fg=COLOR_HEADER, bg=COLOR_CARD, bd=2, relief="groove",
+                                     padx=12, pady=12)
+    marco_controles.pack(fill="x")
 
-    btnGirar = ttk.Button(botones, text="Girar", style="Azul.TButton", command=girar)
-    btnGirar.grid(column=3, row=2, pady=11)
+    chkEliminar = ttk.Checkbutton(marco_controles, text="Eliminar participante al ganar",
+                                   variable=eliminar_var, style="Info.TCheckbutton")
+    chkEliminar.pack(anchor="w", pady=(0, 12))
 
-    btnSalir = ttk.Button(botones, text="Salir", style="Azul.TButton", command=menu)
-    btnSalir.grid(column=3, row=3, pady=11)
+    btnGirar = ttk.Button(marco_controles, text="Girar", style="Primary.TButton", command=girar, width=22)
+    btnGirar.pack(pady=(0, 8))
+
+    btnSalir = ttk.Button(marco_controles, text="Salir al menú", style="Secondary.TButton",
+                           command=menu, width=22)
+    btnSalir.pack()
 
 
 #Creditos
 def creditos():
     limpiar()
-    Titulo = tk.Label(ventana, text="Creditos",
-                    font=("Arial", 14, "bold"),
-                    fg="white", bg="steelblue")
-    Titulo.pack(pady=10)
-    PersonasTxT = tk.Label(ventana, text="""1. Raul
-    2. Jocksand
-    3. Francisco
-    4. Mauricio
-    5. Braxus Calzones
+    ventana.title("Créditos")
+    ventana.geometry("560x560")
+    ventana.configure(background=COLOR_BG)
 
-    FIN""", font=("Arial", 14, "bold"),
-                    fg="white", bg="steelblue")
-    PersonasTxT.pack(pady=10)
-    btnSalir = ttk.Button(ventana, text="Salir", style="Azul.TButton", command=menu)
-    btnSalir.pack(pady=10)
+    tarjeta = tk.Frame(ventana, bg=COLOR_CARD, highlightbackground=COLOR_SECONDARY, highlightthickness=2)
+    tarjeta.place(relx=0.5, rely=0.5, anchor="center", width=420, height=420)
+
+    tk.Label(tarjeta, text="Créditos", font=FUENTE_TITULO, fg=COLOR_HEADER, bg=COLOR_CARD).pack(pady=(30, 20))
+
+    equipo = ["Raul", "Jocksand", "Francisco", "Mauricio", "Braxus Calzones"]
+    for persona in equipo:
+        tk.Label(tarjeta, text=f"•  {persona}", font=FUENTE_TEXTO, fg=COLOR_TEXT,
+                 bg=COLOR_CARD, anchor="w").pack(fill="x", padx=60, pady=4)
+
+    btnSalir = ttk.Button(tarjeta, text="Volver", style="Secondary.TButton", command=menu, width=18)
+    btnSalir.pack(pady=25)
+
+
 menu()
 ventana.mainloop()
