@@ -33,6 +33,27 @@ while True:
 
     elif Cmd == 2:
         print("Se selecciono el while")
+        while True:
+            try:
+                 CantidadEstudiantes = int(input(f"Introduce el numero de estudiantes:"))
+                 break
+            except ValueError:
+                print("Ingresa un numero valido de estudiantes.")
+        p =0
+        while p < CantidadEstudiantes:
+            Notas = []
+            numNombre = random.randint(0, len(List_Nombres)-1)
+            numApellido = random.randint(0, len(List_Apellidos)-1)
+            m =0
+            while m < 3:
+                NotaRandom = random.randint(0, 100)
+                Notas.append(NotaRandom)
+                m+= 1
+
+            print(f"{List_Nombres[numNombre]} {List_Apellidos[numApellido]}: {Notas[0]}, {Notas[1]}, {Notas[2]}, Promedio: {(Notas[0]+Notas[1]+Notas[2])/3 :.2f}")
+            p +=1
+
+
     elif Cmd == 3:
         print("Adios")
         break
