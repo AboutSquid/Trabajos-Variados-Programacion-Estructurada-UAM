@@ -34,6 +34,7 @@ while True:
         ramAntesdelFor = proceso.memory_info().rss / (1024 * 1024)  # mide en MB la RAM que ocupa antes del ciclo for
         proceso.cpu_percent()  #se marca el punto de referencia para guardar la cpu
         cpuTiempoInicial = proceso.cpu_times() #se marca el punto de referencia para el tiempo cpu
+        NotasAcumuladas = 0
         tiempoInicio = time.time()  # inicia el contador
         for i in range(CantidadEstudiantes):
             Notas = []
@@ -42,6 +43,7 @@ while True:
             for j in range(3):
                 NotaRandom = random.randint(0, 100)
                 Notas.append(NotaRandom)
+                NotasAcumuladas += NotaRandom
 
             print(f"{List_Nombres[numNombre]} {List_Apellidos[numApellido]}: {Notas[0]}, {Notas[1]}, {Notas[2]}, Promedio: {(Notas[0]+Notas[1]+Notas[2])/3 :.2f}")
         tiempoFin = time.time() #detiene contador
@@ -51,6 +53,7 @@ while True:
         timecpu = (cpuTiempoFinal.user + cpuTiempoFinal.system) - (cpuTiempoInicial.user + cpuTiempoInicial.system)
         ramDespuesdelFor = proceso.memory_info().rss / (1024 * 1024) #mide en MB la RAM después del ciclo for
         print("-----------------------------------------------------------------------"
+              f"\nEl promedio general es: {NotasAcumuladas / (CantidadEstudiantes * 3):.2f}"
               f"\nCon el ciclo for ha durado {tiempoFin-tiempoInicio:.6f} segundos"
               f"\nRAM usada antes del ciclo for: {(round(ramAntesdelFor,2))} MB"
               f"\nRAM usada después del ciclo for: {round(ramDespuesdelFor,2)} MB."
@@ -71,6 +74,7 @@ while True:
         ramAntesdelWhile = proceso.memory_info().rss / (1024 * 1024)  # mide en MB la RAM que ocupa antes del ciclo while
         proceso.cpu_percent()  #se marca el punto de referencia para guardar la cpu
         cpuTiempoInicial = proceso.cpu_times() #se marca el punto de referencia para el tiempo cpu
+        NotasAcumuladas = 0
         tiempoInicio = time.time()  # inicia el contador
         while p < CantidadEstudiantes:
             Notas = []
@@ -80,6 +84,7 @@ while True:
             while m < 3:
                 NotaRandom = random.randint(0, 100)
                 Notas.append(NotaRandom)
+                NotasAcumuladas += NotaRandom
                 m+= 1
 
             print(f"{List_Nombres[numNombre]} {List_Apellidos[numApellido]}: {Notas[0]}, {Notas[1]}, {Notas[2]}, Promedio: {(Notas[0]+Notas[1]+Notas[2])/3 :.2f}")
@@ -91,6 +96,7 @@ while True:
         timecpu = (cpuTiempoFinal.user + cpuTiempoFinal.system) - (cpuTiempoInicial.user + cpuTiempoInicial.system)
         ramDespuesdelWhile = proceso.memory_info().rss / (1024 * 1024) #mide en MB la RAM después del ciclo while
         print("-----------------------------------------------------------------------"
+              f"\nEl promedio general es: {NotasAcumuladas / (CantidadEstudiantes * 3):.2f}"
               f"\nCon el ciclo while ha durado {tiempoFin - tiempoInicio:.6f} segundos"
               f"\nRAM usada antes del ciclo while: {(round(ramAntesdelWhile, 2))} MB"
               f"\nRAM usada después del ciclo while: {round(ramDespuesdelWhile, 2)} MB."
@@ -102,3 +108,8 @@ while True:
     elif Cmd == 3:
         print("Adios")
         break
+1
+
+
+
+
