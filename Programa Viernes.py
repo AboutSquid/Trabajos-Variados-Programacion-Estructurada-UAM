@@ -44,3 +44,49 @@ o	Promedio general de todos los estudiantes.
 o	El nombre del estudiante con el promedio más alto. 
 """
 
+def ValidarRangos(TextoAMostrar, minimo, maximo, TextoError, TipoDeDato):
+    if TipoDeDato == "int":
+        while True:
+            try:
+                nota = int(input(TextoAMostrar))
+                if minimo < nota <= maximo:
+                    return nota
+                else:
+                    print(TextoError)
+            except ValueError:
+                print(TextoError)
+    elif TipoDeDato == "float":
+        while True:
+            try:
+                nota = float(input(TextoAMostrar))
+                if minimo <= nota <= maximo:
+                    return nota
+                else:
+                    print(TextoError)
+            except ValueError:
+                print(TextoError)
+
+def ValidarString():
+    while True:
+        nombre_estudiante = input("Ingrese el nombre del estudiante: ")
+        if nombre_estudiante and nombre_estudiante.replace(" ", "").isalpha():
+            return nombre_estudiante
+        else:
+            print("Ingrese un nombre válido")
+
+def calcular_promedio(nota1, nota2, nota3):
+    promedio = (nota1 + nota2 + nota3) / 3
+    return promedio
+def determinar_resultado(promedio):
+    if promedio >= 70:
+        return "Aprobó"
+    else:
+        return "Reprobó"
+
+repetir = "s"
+while repetir == "s":
+    print("""--------------------------------------------------------
+            REGISTRO DE ESTUDIANTES
+--------------------------------------------------------""")
+    Numero_Estudiantes = ValidarRangos("Ingrese el número de estudiantes que desea registrar: ", 0, 50,
+                  "Error. Ingrese un número entero válido mayor a 0. \nEl límite a registrar es 40.", "int")
