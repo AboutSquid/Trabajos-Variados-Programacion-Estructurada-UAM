@@ -31,6 +31,7 @@ while True:
                  break
             except ValueError:
                 print("Ingresa un numero valido de estudiantes.")
+        EstudianteAprobados = 0
         ramAntesdelFor = proceso.memory_info().rss / (1024 * 1024)  # mide en MB la RAM que ocupa antes del ciclo for
         proceso.cpu_percent()  #se marca el punto de referencia para guardar la cpu
         cpuTiempoInicial = proceso.cpu_times() #se marca el punto de referencia para el tiempo cpu
@@ -43,7 +44,10 @@ while True:
                 NotaRandom = random.randint(0, 100)
                 Notas.append(NotaRandom)
 
-            print(f"{List_Nombres[numNombre]} {List_Apellidos[numApellido]}: {Notas[0]}, {Notas[1]}, {Notas[2]}, Promedio: {(Notas[0]+Notas[1]+Notas[2])/3 :.2f}")
+            promedio = (Notas[0]+Notas[1]+Notas[2])/3
+            print(f"{List_Nombres[numNombre]} {List_Apellidos[numApellido]}: {Notas[0]}, {Notas[1]}, {Notas[2]}, Promedio: { promedio:.2f}")
+            if promedio >70:
+                EstudianteAprobados += 1
         tiempoFin = time.time() #detiene contador
         cpu = proceso.cpu_percent() #se detiene el intervalo y se devuelve cuanto fue usado
         cpuTiempoFinal = proceso.cpu_times() #se detiene el intervalo y devuelve el tiempo cpu
@@ -57,6 +61,8 @@ while True:
               f"\nVariación de RAM durante el ciclo for: {ramDespuesdelFor-ramAntesdelFor:.6f} MB."
               f"\nUso de CPU durante el ciclo for: {cpu}%"
               f"\nTiempo CPU: {timecpu:.6f} segundos"
+              f"\nEstudiantes Aprobados: {EstudianteAprobados}"
+              f"\nEstudiantes Reprobados: {CantidadEstudiantes - EstudianteAprobados}"
               "\n-----------------------------------------------------------------------")
 
     elif Cmd == 2:
@@ -67,6 +73,7 @@ while True:
                  break
             except ValueError:
                 print("Ingresa un numero valido de estudiantes.")
+        EstudianteAprobados = 0
         p =0
         ramAntesdelWhile = proceso.memory_info().rss / (1024 * 1024)  # mide en MB la RAM que ocupa antes del ciclo while
         proceso.cpu_percent()  #se marca el punto de referencia para guardar la cpu
