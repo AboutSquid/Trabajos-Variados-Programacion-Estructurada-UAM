@@ -1,4 +1,5 @@
 from collections import deque
+import ModuloCantidad
 """========================================
  SISTEMA DE SOPORTE TÉCNICO UNIVERSITARIO
 ========================================
@@ -46,6 +47,7 @@ def ProcesarSolicitud():
                     case 1:
                         ValorEliminado = FilaDeSolicitudes.popleft()
                         print("El valor eliminado es: ", ValorEliminado)
+                        CantidadDeSolicitudes -= 1
                     case 2:
                         break
                     case _:
@@ -68,9 +70,26 @@ def consultarProximaSolicitud(CantidadSolicitud):
         print("Descripción: ", FilaDeSolicitudes[0][2])
         print("-----------------------------------")
     else:
+        print("-----------------------------------")
         print("No se han registrado solicitudes")
+        print("-----------------------------------")
 
-
+def MostrarSolicitudes(CantidadSolicitud):
+    if CantidadSolicitud > 0:
+        i = 0
+        while i < CantidadSolicitud:
+            print("Solicitud ",i+1)
+            print("=====================================")
+            print("-----------------------------------")
+            print("Nombre: ", FilaDeSolicitudes[i][0])
+            print("Equipo Afectado: ", FilaDeSolicitudes[i][1])
+            print("Descripción: ", FilaDeSolicitudes[i][2])
+            print("-----------------------------------")
+            i+=1
+    else:
+        print("-----------------------------------")
+        print("No se han registrado solicitudes")
+        print("-----------------------------------")
 
 
 #Main
@@ -95,6 +114,10 @@ while True:
                 ProcesarSolicitud()
             case 3:
                 consultarProximaSolicitud(CantidadDeSolicitudes)
+            case 4:
+                MostrarSolicitudes(CantidadDeSolicitudes)
+            case 5:
+                ModuloCantidad.ConsultarCantidad(FilaDeSolicitudes)
             case 6:
                 break
             case _:
