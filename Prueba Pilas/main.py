@@ -10,7 +10,7 @@ from collections import deque
 5. Consultar cantidad de solicitudes
 6. Salir
 """
-FilaDeSolicitudes = []
+FilaDeSolicitudes = deque()
 HistorialDesolicitudes = []
 
 #Funciones a realizar
@@ -20,12 +20,45 @@ def RegistrarSolicitud():
     Nombre = input("Ingrese su nombre: ")
     EquipoAfectado = input("Ingrese el equipo afectado: ")
     Descripcion = input("Ingrese la descripcion del problema: ")
-    FilaDeSolicitudes = deque()
     FilaDeSolicitudes.append([Nombre, EquipoAfectado, Descripcion])
     CantidadDeSolicitudes += 1
 
 def ProcesarSolicitud():
     global CantidadDeSolicitudes
+    while True:
+
+        try:
+            FilaDeSolicitudes[0][0]
+            print("La primera solicitud a procesar es: ")
+            print("=====================================")
+            print("1.-----------------------------------")
+            print("Nombre: ", FilaDeSolicitudes[0][0])
+            print("Equipo Afectado: ", FilaDeSolicitudes[0][1])
+            print("Descripcion: ", FilaDeSolicitudes[0][2])
+            print("1.-----------------------------------")
+            print("""
+            1.Eliminar solicitud
+            2.Salir""")
+            print("======================================")
+            try:
+                Seleccion = int(input("Ingrese el numero de la opcion: "))
+                match Seleccion:
+                    case 1:
+                        ValorEliminado = FilaDeSolicitudes.popleft()
+                        print("El valor eliminado es: ", ValorEliminado)
+                    case 2:
+                        break
+                    case _:
+                        print("Opcion invalida")
+            except ValueError:
+                print("Error en el formato")
+
+        except IndexError:
+            print("No hay problemas por resolver")
+            break
+
+
+
 
 #Main
 while True:
@@ -45,6 +78,8 @@ while True:
         match Seleccion:
             case 1:
                 RegistrarSolicitud()
+            case 2:
+                ProcesarSolicitud()
             case 6:
                 break
             case _:
