@@ -33,3 +33,4 @@ def RegistrarSolicitud():
     FilaDeSolicitudes = deque()
     FilaDeSolicitudes.append([Nombre, EquipoAfectado, Descripcion])
     CantidadDeSolicitudes += 1
+
