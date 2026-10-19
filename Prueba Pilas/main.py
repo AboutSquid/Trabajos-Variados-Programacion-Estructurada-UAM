@@ -30,7 +30,7 @@ def ProcesarSolicitud():
 
         try:
             FilaDeSolicitudes[0][0]
-            print("La primera solicitud a procesar es: ")
+            print("La solicitud a procesar es: ")
             print("=====================================")
             print("1.-----------------------------------")
             print("Nombre: ", FilaDeSolicitudes[0][0])
