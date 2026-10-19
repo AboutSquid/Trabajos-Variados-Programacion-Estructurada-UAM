@@ -58,6 +58,19 @@ def ProcesarSolicitud():
             break
 
 
+def consultarProximaSolicitud(CantidadSolicitud):
+    if CantidadSolicitud >0:
+        print("La próxima solicitud a procesar es: ")
+        print("=====================================")
+        print("-----------------------------------")
+        print("Nombre: ", FilaDeSolicitudes[0][0])
+        print("Equipo Afectado: ", FilaDeSolicitudes[0][1])
+        print("Descripción: ", FilaDeSolicitudes[0][2])
+        print("-----------------------------------")
+    else:
+        print("No se han registrado solicitudes")
+
+
 
 
 #Main
@@ -80,6 +93,8 @@ while True:
                 RegistrarSolicitud()
             case 2:
                 ProcesarSolicitud()
+            case 3:
+                consultarProximaSolicitud(CantidadDeSolicitudes)
             case 6:
                 break
             case _:
