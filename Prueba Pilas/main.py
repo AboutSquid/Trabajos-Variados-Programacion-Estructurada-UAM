@@ -9,8 +9,8 @@
 5. Consultar cantidad de solicitudes
 6. Salir
 """
-FilaDeSolicitudes = []
-HistorialDesolicitudes = []
+FilaDeSolicitudes = [[]]
+HistorialDesolicitudes = [[]]
 print(f"""
 ========================================
  SISTEMA DE SOPORTE TÉCNICO UNIVERSITARIO
@@ -22,3 +22,13 @@ print(f"""
 4. Mostrar solicitudes pendientes
 5. Consultar cantidad de solicitudes
 6. Salir""")
+
+CantidadDeSolicitudes = 0
+def RegistrarSolicitud():
+    Nombre = input("Ingrese su nombre: ")
+    EquipoAfectado = input("Ingrese el equipo afectado: ")
+    Descripcion = input("Ingrese la descripcion del problema: ")
+    FilaDeSolicitudes[CantidadDeSolicitudes][0].append(Nombre)
+    FilaDeSolicitudes[CantidadDeSolicitudes][1].append(EquipoAfectado)
+    FilaDeSolicitudes[CantidadDeSolicitudes][2].append(Descripcion)
+    
